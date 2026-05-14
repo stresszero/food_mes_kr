@@ -35,8 +35,27 @@ DB에 저장되므로 `bench update` 시 ERPNext가 업그레이드되어도 수
 
 4. **Save**
 
-> **주의:** Language를 `en` (English)으로 설정하면 적용되지 않는다.
+> **주의 1:** Language를 `en` (English)으로 설정하면 적용되지 않는다.
 > 반드시 `ko`로 선택해야 한다.
+
+> **주의 2:** Translation 레코드 1개 = 번역 단어 1개다.
+> Source Text 필드는 여러 줄 입력이 가능한 코드 에디터이지만,
+> 줄바꿈으로 여러 단어를 구분해 넣으면 동작하지 않는다.
+> 반드시 번역할 단어마다 별도 레코드를 생성해야 한다.
+
+#### 왜 여러 단어를 한 레코드에 넣으면 안 되는가
+
+Source Text에 아래처럼 입력하면:
+
+```
+Source Warehouse
+Target Warehouse
+```
+
+시스템은 줄바꿈을 포함한 전체 문자열 `"Source Warehouse\nTarget Warehouse"`를
+하나의 조회 키로 저장한다. 그러나 실제 번역 조회 시에는
+`"Source Warehouse"` 또는 `"Target Warehouse"` 각각으로 찾기 때문에
+키가 일치하지 않아 번역이 적용되지 않는다.
 
 ### 저장 후 적용
 
