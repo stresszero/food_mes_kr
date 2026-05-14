@@ -13,7 +13,7 @@ food_mes_kr/food_mes_kr/demo_seed.py
 """
 
 import frappe
-from frappe.utils import today, add_days
+from frappe.utils import today, add_days, flt
 
 
 COMPANY = None  # run() 시점에 첫 회사 자동 선택
@@ -433,6 +433,9 @@ def create_trace_demo():
         se.submit()
         print(f"  → 입고: {nb['item']} {nb['target_qty']}{nb['uom']}")
 
+    # tabBin valuation_rate 가 transfer 검증 전에 DB에 반영되도록 커밋
+    frappe.db.commit()
+
     # ── 2. Work Order 확보 (qty ≤ 200인 Draft 재사용 또는 신규) ──────────
     # 대형 WO를 재사용하면 원료 재고 부족이 발생하므로 소형(≤200) WO만 사용
     wo_name = frappe.db.get_value(
@@ -486,12 +489,16 @@ def create_trace_demo():
             "RM-APPLE-CONC": "TRACE-APPLE-001",
             "RM-VITC":       "TRACE-VITC-001",
         }
+        non_batch_rate_map = {nb["item"]: nb["rate"] for nb in non_batch_items}
         for row in transfer_se.items:
             if not row.s_warehouse:
                 row.s_warehouse = raw_wh
             if row.item_code in batch_map:
                 row.batch_no = batch_map[row.item_code]
                 row.use_serial_batch_fields = 1
+            elif row.item_code in non_batch_rate_map and not flt(row.basic_rate):
+                # get_valuation_rate 가 0을 반환할 경우 시드 단가로 보정
+                row.basic_rate = non_batch_rate_map[row.item_code]
 
         transfer_se.insert(ignore_permissions=True)
         transfer_se.submit()
