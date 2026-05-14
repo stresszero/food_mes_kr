@@ -7,6 +7,14 @@
 
 set -euo pipefail
 
+# .env 파일이 있으면 로드 (없으면 기본값 사용)
+if [ -f .env ]; then
+    set -a; source .env; set +a
+fi
+
+DB_PASSWORD="${DB_PASSWORD:-admin}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
+
 BENCH="docker compose exec -T backend bench"
 
 # ─────────────────────────────────────────────
@@ -20,7 +28,7 @@ echo "╚═══════════════════════�
 echo ""
 
 echo "⏳ MariaDB 준비 대기..."
-until docker compose exec -T mariadb mariadb-admin ping -h localhost --password=admin --silent 2>/dev/null; do
+until docker compose exec -T mariadb mariadb-admin ping -h localhost --password="${DB_PASSWORD}" --silent 2>/dev/null; do
     printf "."
     sleep 3
 done
@@ -44,8 +52,8 @@ if $BENCH --site dev.localhost list-apps &>/dev/null 2>&1; then
 else
     echo "1/5 사이트 생성 중..."
     $BENCH new-site dev.localhost \
-        --mariadb-root-password admin \
-        --admin-password admin \
+        --mariadb-root-password "${DB_PASSWORD}" \
+        --admin-password "${ADMIN_PASSWORD}" \
         --db-name frappe_dev
     echo "    ✓ dev.localhost 생성"
 fi

@@ -85,11 +85,11 @@ services:
       - --skip-character-set-client-handshake
       - --skip-innodb-read-only-compressed
     environment:
-      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-admin}
     volumes:
       - mariadb-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "--password=admin"]
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "--password=${DB_PASSWORD:-admin}"]
       interval: 10s
       timeout: 5s
       retries: 10

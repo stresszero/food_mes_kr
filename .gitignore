@@ -33,9 +33,18 @@ Desktop.ini
 # secrets - never commit
 .env
 .env.local
+.env.*
+!.env.example
 secrets.json
 *_secret.py
 *credentials*
+
+# 인증서 및 개인키
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
 # customer-specific data (don't ship in app repo)
 local_data/
