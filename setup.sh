@@ -28,7 +28,10 @@ echo "╚═══════════════════════�
 echo ""
 
 echo "⏳ MariaDB 준비 대기..."
-until docker compose exec -T mariadb mariadb-admin ping -h localhost --password="${DB_PASSWORD}" --silent 2>/dev/null; do
+# backend 컨테이너에서 mariadb:3306 TCP 접속 가능 여부를 확인 (실제 연결 경로와 동일)
+until docker compose exec -T backend \
+    python3 -c "import socket,sys; s=socket.socket(); s.settimeout(3); s.connect(('mariadb',3306)); s.close()" \
+    2>/dev/null; do
     printf "."
     sleep 3
 done
