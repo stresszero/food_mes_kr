@@ -64,6 +64,11 @@ fi
 # ─────────────────────────────────────────────
 
 echo "2/5 앱 설치 중..."
+
+# food_mes_kr 이 apps.txt 에 없으면 추가 (Dockerfile 캐시 문제 대비)
+docker compose exec -T backend bash -c \
+    "grep -qxF food_mes_kr apps.txt || echo food_mes_kr >> apps.txt"
+
 # bench install-app 은 이미 설치된 앱을 자체적으로 건너뜀 (멱등)
 $BENCH --site dev.localhost install-app erpnext
 $BENCH --site dev.localhost install-app food_mes_kr
