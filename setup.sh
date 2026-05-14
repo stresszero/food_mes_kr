@@ -64,12 +64,6 @@ fi
 # ─────────────────────────────────────────────
 
 echo "2/5 앱 설치 중..."
-
-# food_mes_kr 이 apps.txt 에 없으면 추가 (절대 경로 사용)
-APPS_TXT=/home/frappe/frappe-bench/apps.txt
-docker compose exec -T backend bash -c \
-    "grep -qxF food_mes_kr ${APPS_TXT} || echo food_mes_kr >> ${APPS_TXT}"
-
 # bench install-app 은 이미 설치된 앱을 자체적으로 건너뜀 (멱등)
 $BENCH --site dev.localhost install-app erpnext
 $BENCH --site dev.localhost install-app food_mes_kr

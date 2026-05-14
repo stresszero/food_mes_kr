@@ -1,8 +1,6 @@
 FROM frappe/erpnext:version-15
 
-# food_mes_kr 앱 복사 및 설치
-# .dockerignore 가 __pycache__, *.egg-info 등을 제외한다
-COPY --chown=frappe:frappe . /home/frappe/frappe-bench/apps/food_mes_kr/
-
-RUN /home/frappe/frappe-bench/env/bin/pip install --no-cache-dir -e /home/frappe/frappe-bench/apps/food_mes_kr \
-    && echo "food_mes_kr" >> /home/frappe/frappe-bench/apps.txt
+# bench get-app 을 사용해 앱을 등록한다.
+# pip install + apps.txt 추가를 bench 가 직접 처리하므로
+# 수동으로 apps.txt 를 조작할 필요가 없다.
+RUN bench get-app https://github.com/stresszero/food_mes_kr.git
