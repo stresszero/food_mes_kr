@@ -372,12 +372,17 @@ def create_trace_demo():
                 "expiry_date": b["expiry"],
             }).insert(ignore_permissions=True)
 
-        existing_qty = frappe.db.sql(
-            "SELECT SUM(actual_qty) FROM `tabStock Ledger Entry` "
-            "WHERE item_code=%s AND batch_no=%s AND warehouse=%s AND is_cancelled=0",
-            (b["item"], b["batch_id"], raw_wh)
-        )
-        if existing_qty and existing_qty[0][0] and existing_qty[0][0] > 0:
+        # v15: SLE.batch_no 는 항상 NULL — SBB/SBE 통해 배치 재고 확인
+        existing_qty = frappe.db.sql("""
+            SELECT COALESCE(SUM(sbe.qty), 0)
+            FROM `tabSerial and Batch Entry` sbe
+            JOIN `tabSerial and Batch Bundle` sbb ON sbe.parent = sbb.name
+            WHERE sbe.batch_no = %s
+            AND sbb.warehouse = %s
+            AND sbb.docstatus = 1
+            AND sbb.is_cancelled = 0
+        """, (b["batch_id"], raw_wh))[0][0]
+        if existing_qty > 0:
             print(f"  → {b['batch_id']} 재고 이미 있음, skip")
             continue
 
