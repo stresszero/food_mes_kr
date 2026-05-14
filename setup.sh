@@ -47,7 +47,8 @@ echo ""
 # 1. 사이트 생성
 # ─────────────────────────────────────────────
 
-if docker compose exec -T backend bench --list-sites 2>/dev/null | grep -q "dev.localhost"; then
+# 사이트 디렉터리 존재 여부로 판단 (bench 명령 의존 없음)
+if docker compose exec -T backend test -d sites/dev.localhost; then
     echo "1/5 사이트가 이미 존재합니다. 건너뜀."
 else
     echo "1/5 사이트 생성 중..."
@@ -64,19 +65,17 @@ fi
 
 echo "2/5 앱 설치 확인..."
 
-INSTALLED_APPS=$(docker compose exec -T backend bash -c \
-    "cd /home/frappe/frappe-bench && env/bin/python -c \
-    \"import frappe; frappe.init('dev.localhost'); frappe.connect(); print(' '.join(frappe.get_installed_apps()))\" \
-    2>/dev/null" || true)
-
-if echo "${INSTALLED_APPS}" | grep -q erpnext; then
+# installed_apps.txt 파일로 설치 여부 판단 (DB 조회 불필요)
+if docker compose exec -T backend test -f sites/dev.localhost/installed_apps.txt && \
+   docker compose exec -T backend grep -q erpnext sites/dev.localhost/installed_apps.txt 2>/dev/null; then
     echo "    ERPNext 이미 설치됨. 건너뜀."
 else
     echo "    ERPNext 설치 중..."
     $BENCH --site dev.localhost install-app erpnext
 fi
 
-if echo "${INSTALLED_APPS}" | grep -q food_mes_kr; then
+if docker compose exec -T backend test -f sites/dev.localhost/installed_apps.txt && \
+   docker compose exec -T backend grep -q food_mes_kr sites/dev.localhost/installed_apps.txt 2>/dev/null; then
     echo "    food_mes_kr 이미 설치됨. 건너뜀."
 else
     echo "    food_mes_kr 설치 중..."
