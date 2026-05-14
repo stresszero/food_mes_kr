@@ -63,24 +63,10 @@ fi
 # 2. 앱 설치
 # ─────────────────────────────────────────────
 
-echo "2/5 앱 설치 확인..."
-
-# installed_apps.txt 파일로 설치 여부 판단 (DB 조회 불필요)
-if docker compose exec -T backend test -f sites/dev.localhost/installed_apps.txt && \
-   docker compose exec -T backend grep -q erpnext sites/dev.localhost/installed_apps.txt 2>/dev/null; then
-    echo "    ERPNext 이미 설치됨. 건너뜀."
-else
-    echo "    ERPNext 설치 중..."
-    $BENCH --site dev.localhost install-app erpnext
-fi
-
-if docker compose exec -T backend test -f sites/dev.localhost/installed_apps.txt && \
-   docker compose exec -T backend grep -q food_mes_kr sites/dev.localhost/installed_apps.txt 2>/dev/null; then
-    echo "    food_mes_kr 이미 설치됨. 건너뜀."
-else
-    echo "    food_mes_kr 설치 중..."
-    $BENCH --site dev.localhost install-app food_mes_kr
-fi
+echo "2/5 앱 설치 중..."
+# bench install-app 은 이미 설치된 앱을 자체적으로 건너뜀 (멱등)
+$BENCH --site dev.localhost install-app erpnext
+$BENCH --site dev.localhost install-app food_mes_kr
 
 $BENCH --site dev.localhost set-config developer_mode 1
 echo "    ✓ 앱 설치 완료"
