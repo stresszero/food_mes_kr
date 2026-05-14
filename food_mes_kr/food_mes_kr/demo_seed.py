@@ -13,7 +13,7 @@ food_mes_kr/food_mes_kr/demo_seed.py
 """
 
 import frappe
-from frappe.utils import today, add_days, flt
+from frappe.utils import today, add_days
 
 
 COMPANY = None  # run() 시점에 첫 회사 자동 선택
@@ -82,11 +82,11 @@ def _create_items():
         {"code": "RM-PEAR-DORAJI", "name": "배도라지 추출액",
          "is_stock": 1, "has_batch": 1, "shelf_life": 365, "uom": "L"},
         {"code": "RM-WATER", "name": "정제수",
-         "is_stock": 1, "has_batch": 0, "uom": "L"},
+         "is_stock": 1, "has_batch": 0, "uom": "L", "valuation_rate": 100},
         {"code": "RM-VITC", "name": "비타민C",
          "is_stock": 1, "has_batch": 1, "shelf_life": 730, "uom": "kg"},
         {"code": "RM-POUCH-80ML", "name": "스파우트파우치 80mL",
-         "is_stock": 1, "has_batch": 0, "uom": "Pouch"},
+         "is_stock": 1, "has_batch": 0, "uom": "Pouch", "valuation_rate": 50},
         # 완제품
         {"code": "FG-HELLO-APPLE", "name": "헬로아이 착즙 달콤사과 80mL",
          "is_stock": 1, "has_batch": 1, "shelf_life": 270, "uom": "Pouch",
@@ -110,6 +110,7 @@ def _create_items():
             "create_new_batch": it.get("has_batch", 0),
             "has_expiry_date": 1 if it.get("shelf_life") else 0,
             "shelf_life_in_days": it.get("shelf_life") or 0,
+            "valuation_rate": it.get("valuation_rate") or 0,
         })
         doc.insert()
         # Custom Fields
@@ -489,16 +490,12 @@ def create_trace_demo():
             "RM-APPLE-CONC": "TRACE-APPLE-001",
             "RM-VITC":       "TRACE-VITC-001",
         }
-        non_batch_rate_map = {nb["item"]: nb["rate"] for nb in non_batch_items}
         for row in transfer_se.items:
             if not row.s_warehouse:
                 row.s_warehouse = raw_wh
             if row.item_code in batch_map:
                 row.batch_no = batch_map[row.item_code]
                 row.use_serial_batch_fields = 1
-            elif row.item_code in non_batch_rate_map and not flt(row.basic_rate):
-                # get_valuation_rate 가 0을 반환할 경우 시드 단가로 보정
-                row.basic_rate = non_batch_rate_map[row.item_code]
 
         transfer_se.insert(ignore_permissions=True)
         transfer_se.submit()
