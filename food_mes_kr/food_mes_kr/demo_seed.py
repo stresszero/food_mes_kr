@@ -491,8 +491,7 @@ def create_trace_demo():
             "RM-VITC":       "TRACE-VITC-001",
         }
         for row in transfer_se.items:
-            if not row.s_warehouse:
-                row.s_warehouse = raw_wh
+            row.s_warehouse = raw_wh  # 시연 재고는 모두 raw_wh에 입고됨
             if row.item_code in batch_map:
                 row.batch_no = batch_map[row.item_code]
                 row.use_serial_batch_fields = 1
