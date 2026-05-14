@@ -1,0 +1,22 @@
+{
+ "align_labels_with_tortured_minds": 0,
+ "creation": "2026-05-12 00:00:00.000000",
+ "custom_format": 1,
+ "default_print_language": "ko",
+ "disabled": 0,
+ "doc_type": "Work Order",
+ "docstatus": 0,
+ "doctype": "Print Format",
+ "font": "Default",
+ "html": "{% set lot_no = doc.production_lot_no or doc.name %}\n{% set wo_url = frappe.utils.get_url() + \"/app/work-order/\" + doc.name %}\n\n<style>\n  .lot-label {\n    width: 88mm;\n    min-height: 60mm;\n    padding: 6mm 8mm;\n    font-family: 'Noto Sans KR', sans-serif;\n    box-sizing: border-box;\n    border: 1px solid #ddd;\n  }\n  .company-name {\n    font-size: 9pt;\n    color: #666;\n    margin-bottom: 3mm;\n  }\n  .lot-row {\n    display: flex;\n    align-items: center;\n    gap: 6mm;\n    margin-bottom: 4mm;\n  }\n  .qr-img { width: 28mm; height: 28mm; flex-shrink: 0; }\n  .lot-no {\n    font-size: 16pt;\n    font-weight: bold;\n    letter-spacing: 1px;\n    line-height: 1.2;\n    word-break: break-all;\n  }\n  table.fields { width: 100%; border-collapse: collapse; font-size: 9pt; }\n  table.fields td { padding: 1mm 0; }\n  table.fields td:first-child { color: #888; width: 22mm; }\n  table.fields td:last-child { font-weight: 500; }\n  .divider { border-top: 1px solid #eee; margin: 3mm 0; }\n</style>\n\n<div class=\"lot-label\">\n\n  <div class=\"company-name\">{{ doc.company }}</div>\n\n  <div class=\"lot-row\">\n    <img class=\"qr-img\"\n         src=\"data:image/png;base64,{{ get_qr_png(wo_url, 5) }}\"\n         alt=\"QR\" />\n    <div class=\"lot-no\">{{ lot_no }}</div>\n  </div>\n\n  <div class=\"divider\"></div>\n\n  <table class=\"fields\">\n    <tr>\n      <td>품목</td>\n      <td>{{ doc.production_item_name or doc.production_item }}</td>\n    </tr>\n    <tr>\n      <td>생산수량</td>\n      <td>{{ doc.qty | int }} {{ doc.stock_uom }}</td>\n    </tr>\n    {% if doc.mfg_date %}\n    <tr>\n      <td>제조일자</td>\n      <td>{{ doc.mfg_date }}</td>\n    </tr>\n    {% endif %}\n    {% if doc.best_before_date %}\n    <tr>\n      <td>유통기한</td>\n      <td>{{ doc.best_before_date }}</td>\n    </tr>\n    {% endif %}\n    {% if doc.production_line %}\n    <tr>\n      <td>생산라인</td>\n      <td>{{ doc.production_line }}</td>\n    </tr>\n    {% endif %}\n  </table>\n\n</div>",
+ "idx": 0,
+ "line_breaks": 0,
+ "modified": "2026-05-12 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Food Mes Kr",
+ "name": "Work Order LOT Label",
+ "owner": "Administrator",
+ "print_format_type": "Jinja",
+ "show_section_headings": 0,
+ "standard": "No"
+}

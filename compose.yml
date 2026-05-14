@@ -1,0 +1,108 @@
+name: food-mes-demo
+
+# 모든 Python 서비스에 공통 적용되는 설정
+x-app: &app
+  build:
+    context: .
+    dockerfile: Dockerfile
+  volumes:
+    - sites:/home/frappe/frappe-bench/sites
+    - logs:/home/frappe/frappe-bench/logs
+  restart: unless-stopped
+  depends_on:
+    configurator:
+      condition: service_completed_successfully
+
+services:
+
+  # 시작 시 bench 설정 파일을 작성하고 종료하는 일회성 컨테이너
+  configurator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: "no"
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+      - logs:/home/frappe/frappe-bench/logs
+    command:
+      - bash
+      - -c
+      - |
+        bench set-config -g db_host mariadb &&
+        bench set-config -gp db_port 3306 &&
+        bench set-config -g redis_cache redis://redis-cache:6379 &&
+        bench set-config -g redis_queue redis://redis-queue:6379 &&
+        bench set-config -g redis_socketio redis://redis-queue:6379 &&
+        bench set-config -gp socketio_port 9000
+
+  # Frappe WSGI 백엔드 (gunicorn)
+  backend:
+    <<: *app
+
+  # nginx 리버스 프록시 — 브라우저가 접속하는 진입점
+  frontend:
+    image: frappe/erpnext:version-15
+    restart: unless-stopped
+    command: nginx-entrypoint.sh
+    depends_on:
+      configurator:
+        condition: service_completed_successfully
+    environment:
+      BACKEND: backend:8000
+      FRAPPE_SITE_NAME_HEADER: dev.localhost
+      SOCKETIO: websocket:9000
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 50m
+    volumes:
+      - sites:/home/frappe/frappe-bench/sites
+    ports:
+      - "8080:8080"
+
+  # Socket.IO 실시간 이벤트
+  websocket:
+    <<: *app
+    command: node /home/frappe/frappe-bench/apps/frappe/socketio.js
+
+  # 스케줄러 (정기 작업)
+  scheduler:
+    <<: *app
+    command: bench schedule
+
+  # 백그라운드 워커
+  worker:
+    <<: *app
+    command: bench worker --queue short,default,long
+
+  mariadb:
+    image: mariadb:10.6
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "--password=admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis-cache:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  redis-queue:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+volumes:
+  mariadb-data:
+  sites:
+  logs:

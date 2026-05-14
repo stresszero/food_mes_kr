@@ -1,0 +1,201 @@
+[
+ {
+  "doctype": "Custom Field",
+  "name": "Workstation-line_code",
+  "dt": "Workstation",
+  "fieldname": "line_code",
+  "label": "Line Code (라인 코드)",
+  "fieldtype": "Data",
+  "insert_after": "workstation_name",
+  "description": "LOT 번호 채번 시 사용. 예: L1, L2, PKG. 영숫자 1~6자.",
+  "length": 6,
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Work Order-production_lot_no",
+  "dt": "Work Order",
+  "fieldname": "production_lot_no",
+  "label": "Production LOT No (제조번호)",
+  "fieldtype": "Data",
+  "insert_after": "naming_series",
+  "read_only": 1,
+  "in_list_view": 1,
+  "in_standard_filter": 1,
+  "description": "한국식 LOT 자동 채번 (YYMMDD-LINE-SEQ).",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Work Order-production_line",
+  "dt": "Work Order",
+  "fieldname": "production_line",
+  "label": "Production Line",
+  "fieldtype": "Link",
+  "options": "Workstation",
+  "insert_after": "production_lot_no",
+  "description": "LOT 채번 기준 라인. 비우면 Operations 첫 행 사용.",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Work Order-production_shift",
+  "dt": "Work Order",
+  "fieldname": "production_shift",
+  "label": "Production Shift (생산 교대)",
+  "fieldtype": "Select",
+  "options": "\n1교대 (06-14)\n2교대 (14-22)\n3교대 (22-06)",
+  "insert_after": "production_line",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Work Order-mfg_date",
+  "dt": "Work Order",
+  "fieldname": "mfg_date",
+  "label": "Mfg Date (제조일자)",
+  "fieldtype": "Date",
+  "insert_after": "production_shift",
+  "read_only": 1,
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Work Order-best_before_date",
+  "dt": "Work Order",
+  "fieldname": "best_before_date",
+  "label": "Best Before Date (유통기한)",
+  "fieldtype": "Date",
+  "insert_after": "mfg_date",
+  "read_only": 1,
+  "description": "Item.shelf_life_in_days 로 자동 계산.",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item-allergen_flags",
+  "dt": "Item",
+  "fieldname": "allergen_flags",
+  "label": "Allergens (알러기 유발 표시 대상)",
+  "fieldtype": "Small Text",
+  "insert_after": "shelf_life_in_days",
+  "description": "쉼표 구분: 대두, 우유, 메밀, 밀, 계란, 땅콩, 호두, 잣, 새우 등 식약처 22종.",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item-is_halal",
+  "dt": "Item",
+  "fieldname": "is_halal",
+  "label": "Halal 인증",
+  "fieldtype": "Check",
+  "insert_after": "allergen_flags",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item-is_organic",
+  "dt": "Item",
+  "fieldname": "is_organic",
+  "label": "유기농 인증",
+  "fieldtype": "Check",
+  "insert_after": "is_halal",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item-kc_food_code",
+  "dt": "Item",
+  "fieldname": "kc_food_code",
+  "label": "식품유형 분류번호",
+  "fieldtype": "Data",
+  "insert_after": "is_organic",
+  "description": "식약처 식품 분류 코드 (예: 04101 - 과채주스).",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item-customer_owned",
+  "dt": "Item",
+  "fieldname": "customer_owned",
+  "label": "OEM/ODM 제품 (고객사 소유)",
+  "fieldtype": "Check",
+  "insert_after": "kc_food_code",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Item Quality Inspection Parameter-is_ccp",
+  "dt": "Item Quality Inspection Parameter",
+  "fieldname": "is_ccp",
+  "label": "Is CCP (HACCP 중요관리점)",
+  "fieldtype": "Check",
+  "insert_after": "specification",
+  "description": "HACCP 관리계획서상 CCP 항목인지 표시.",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-severity",
+  "dt": "Non Conformance",
+  "fieldname": "severity",
+  "label": "Severity",
+  "fieldtype": "Select",
+  "options": "Low\nMedium\nHigh\nCritical",
+  "insert_after": "status",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-due_date",
+  "dt": "Non Conformance",
+  "fieldname": "due_date",
+  "label": "Due Date",
+  "fieldtype": "Date",
+  "insert_after": "severity",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-assigned_to",
+  "dt": "Non Conformance",
+  "fieldname": "assigned_to",
+  "label": "Assigned To",
+  "fieldtype": "Link",
+  "options": "User",
+  "insert_after": "due_date",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-linked_quality_inspection",
+  "dt": "Non Conformance",
+  "fieldname": "linked_quality_inspection",
+  "label": "Linked Quality Inspection",
+  "fieldtype": "Link",
+  "options": "Quality Inspection",
+  "insert_after": "assigned_to",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-linked_batch",
+  "dt": "Non Conformance",
+  "fieldname": "linked_batch",
+  "label": "Linked Batch (영향 LOT)",
+  "fieldtype": "Link",
+  "options": "Batch",
+  "insert_after": "linked_quality_inspection",
+  "module": "Food Mes Kr"
+ },
+ {
+  "doctype": "Custom Field",
+  "name": "Non Conformance-effectiveness_check",
+  "dt": "Non Conformance",
+  "fieldname": "effectiveness_check",
+  "label": "Effectiveness Check (효과성 검증)",
+  "fieldtype": "Text",
+  "insert_after": "preventive_action",
+  "module": "Food Mes Kr"
+ }
+]

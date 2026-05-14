@@ -1,0 +1,2 @@
+# 일회성 마이그레이션 스크립트는 여기 등록
+# 형식: food_mes_kr.patches.<filename without .py>

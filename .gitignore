@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+
+# Frappe / Bench
+*.log
+sites/
+config/
+logs/
+env/
+node_modules/
+public/built.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# secrets - never commit
+.env
+.env.local
+secrets.json
+*_secret.py
+*credentials*
+
+# customer-specific data (don't ship in app repo)
+local_data/
+customer_data/
+*.bak.sql
+*.backup
+
+# build artifacts
+build/
+dist/
+*.egg-info/
+
+# tests
+.coverage
+.pytest_cache/
+htmlcov/
+
+# notes
+NOTES.md
+TODO.local.md
