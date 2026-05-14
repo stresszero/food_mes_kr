@@ -47,7 +47,7 @@ echo ""
 # 1. 사이트 생성
 # ─────────────────────────────────────────────
 
-if $BENCH --site dev.localhost list-apps &>/dev/null 2>&1; then
+if docker compose exec -T backend bench --list-sites 2>/dev/null | grep -q "dev.localhost"; then
     echo "1/5 사이트가 이미 존재합니다. 건너뜀."
 else
     echo "1/5 사이트 생성 중..."
@@ -64,12 +64,21 @@ fi
 
 echo "2/5 앱 설치 확인..."
 
-if ! $BENCH --site dev.localhost list-apps 2>/dev/null | grep -q erpnext; then
+INSTALLED_APPS=$(docker compose exec -T backend bash -c \
+    "cd /home/frappe/frappe-bench && env/bin/python -c \
+    \"import frappe; frappe.init('dev.localhost'); frappe.connect(); print(' '.join(frappe.get_installed_apps()))\" \
+    2>/dev/null" || true)
+
+if echo "${INSTALLED_APPS}" | grep -q erpnext; then
+    echo "    ERPNext 이미 설치됨. 건너뜀."
+else
     echo "    ERPNext 설치 중..."
     $BENCH --site dev.localhost install-app erpnext
 fi
 
-if ! $BENCH --site dev.localhost list-apps 2>/dev/null | grep -q food_mes_kr; then
+if echo "${INSTALLED_APPS}" | grep -q food_mes_kr; then
+    echo "    food_mes_kr 이미 설치됨. 건너뜀."
+else
     echo "    food_mes_kr 설치 중..."
     $BENCH --site dev.localhost install-app food_mes_kr
 fi
