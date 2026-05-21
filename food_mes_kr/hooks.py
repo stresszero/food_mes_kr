@@ -97,8 +97,8 @@ fixtures = [
         "filters": [["module", "=", "Food Mes Kr"]],
     },
     {
-        "doctype": "Custom DocPerm",
-        "filters": [["module", "=", "Food Mes Kr"]],
+        "doctype": "Translation",
+        "filters": [["language", "=", "ko"]],
     },
 ]
 
